@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEYVRA — Epoch</title>
+<meta name="description" content="KEYVRA epoch status. Epoch #001 is coming soon. Every KEYVRA = 1 TH of staking power.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d09;
+    --bg-panel:#0c110b;
+    --green:#c6ff3d;
+    --green-soft:#9fe62f;
+    --green-dim:rgba(198,255,61,.35);
+    --green-faint:rgba(198,255,61,.14);
+    --white:#f2f5ec;
+    --grey:#8a9483;
+    --font-display:'Press Start 2P', monospace;
+    --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--bg);overflow-x:hidden;}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:var(--font-mono);
+    line-height:1.5;
+    padding:14px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:1120px;margin:0 auto;}
+
+  /* corner-bracket frame, reused everywhere */
+  .frame{
+    position:relative;
+    border:1px solid var(--green-dim);
+    background:var(--bg-panel);
+  }
+  .frame::before,.frame::after{
+    content:"";
+    position:absolute;
+    width:14px;height:14px;
+    pointer-events:none;
+  }
+  .frame::before{ /* top-left */
+    top:-1px;left:-1px;
+    border-top:2px solid var(--green);
+    border-left:2px solid var(--green);
+  }
+  .frame::after{ /* bottom-right */
+    bottom:-1px;right:-1px;
+    border-bottom:2px solid var(--green);
+    border-right:2px solid var(--green);
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);
+    font-size:20px;letter-spacing:1px;color:var(--white);
+  }
+  .logo-mark{
+    width:30px;height:30px;background:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    clip-path:polygon(30% 0,100% 0,70% 100%,0 100%);
+    color:#0a0d09;font-size:14px;
+  }
+  nav{display:flex;gap:34px;}
+  nav a{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:1px;color:var(--white);
+    padding-bottom:8px;position:relative;
+  }
+  nav a.active{color:var(--green);}
+  nav a.active::after{
+    content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--green);
+  }
+  .wallet-btn{
+    font-family:var(--font-display);
+    font-size:10px;letter-spacing:.5px;
+    color:var(--green);
+    border:1px solid var(--green-dim);
+    padding:12px 18px;
+    display:flex;align-items:center;gap:10px;
+    background:var(--bg-panel);
+  }
+  .wallet-btn:hover{border-color:var(--green);}
+
+  /* ===== page intro (no hero / no banner) ===== */
+  .intro{
+    padding:40px 26px 6px;
+  }
+  .intro-title{
+    font-family:var(--font-display);
+    font-size:26px;letter-spacing:1px;color:var(--white);
+  }
+  .intro-title .accent{color:var(--green);}
+  .intro-rule{
+    border:none;border-top:2px dashed var(--green-dim);
+    width:100px;margin:16px 0 14px;
+  }
+  .intro-sub{
+    color:var(--grey);font-size:13.5px;max-width:480px;
+  }
+
+  section{margin-top:44px;}
+  .section-head{
+    display:flex;align-items:center;gap:14px;
+    font-family:var(--font-display);
+    font-size:15px;color:var(--green);
+    letter-spacing:1px;
+    padding:0 6px;
+  }
+  .section-head .rule{
+    flex:1;height:0;border-top:1px dashed var(--green-dim);
+  }
+  .section-head .tag{
+    font-family:var(--font-mono);
+    font-size:10px;color:var(--grey);white-space:nowrap;
+  }
+
+  /* ===== how it works ===== */
+  .how-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+  }
+  .how-card{padding:22px 18px;}
+  .how-num{
+    font-family:var(--font-display);font-size:20px;color:var(--green-dim);
+    margin-bottom:14px;
+  }
+  .how-title{
+    font-family:var(--font-display);font-size:12px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:10px;
+  }
+  .how-desc{font-size:12.5px;color:var(--grey);line-height:1.55;}
+
+  /* ===== epoch + prize grid ===== */
+  .top-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:1.3fr 1fr;gap:20px;
+    align-items:stretch;
+  }
+  .epoch-panel{padding:26px;}
+  .epoch-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .epoch-head .k{font-size:11px;color:var(--grey);letter-spacing:1px;}
+  .soon-badge{
+    font-family:var(--font-display);font-size:8px;letter-spacing:1px;
+    color:var(--green);background:transparent;border:1px solid var(--green-dim);
+    padding:4px 8px;display:inline-flex;align-items:center;gap:6px;
+  }
+  .epoch-number{
+    font-family:var(--font-display);font-size:32px;color:var(--white);
+  }
+  .epoch-meta{
+    display:flex;gap:34px;flex-wrap:wrap;margin-top:22px;
+  }
+  .epoch-meta .m{min-width:100px;}
+  .epoch-meta .m .label{font-size:10.5px;color:var(--grey);letter-spacing:.5px;margin-bottom:8px;}
+  .epoch-meta .m .value{font-family:var(--font-display);font-size:16px;color:var(--white);}
+  .epoch-meta .m .value.accent{color:var(--green);}
+
+  .prize-panel{padding:26px;display:flex;flex-direction:column;justify-content:space-between;}
+  .prize-label{font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:14px;}
+  .prize-value{
+    font-family:var(--font-display);font-size:26px;color:var(--green);line-height:1.4;
+  }
+  .prize-value .unit{font-size:11px;color:var(--grey);margin-left:6px;}
+  .prize-note{
+    font-size:12.5px;color:var(--grey);margin-top:18px;max-width:34ch;
+  }
+
+  /* ===== epoch history table ===== */
+  .history-frame{margin-top:22px;padding:6px;overflow-x:auto;}
+  table.history-table{
+    width:100%;border-collapse:collapse;min-width:560px;
+  }
+  .history-table th{
+    font-family:var(--font-display);font-size:9.5px;letter-spacing:.5px;
+    color:var(--grey);text-align:left;padding:16px 14px;
+    border-bottom:1px dashed var(--green-dim);white-space:nowrap;
+  }
+  .history-table td{
+    font-family:var(--font-mono);font-size:13px;color:var(--white);
+    padding:16px 14px;border-bottom:1px dashed var(--green-faint);
+    white-space:nowrap;
+  }
+  .history-table td.dim{color:var(--grey);}
+  .history-table td .soon-badge{font-size:8px;}
+
+  /* ===== footer ===== */
+  footer{
+    margin-top:50px;padding:26px 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    border-top:1px solid var(--green-dim);
+  }
+  .foot-logo{font-family:var(--font-display);font-size:14px;color:var(--green);}
+  .foot-copy{font-size:11px;color:var(--grey);margin-top:4px;}
+  .foot-links{display:flex;gap:18px;font-size:12px;color:var(--grey);flex-wrap:wrap;}
+  .foot-icons{display:flex;gap:16px;align-items:center;color:var(--grey);font-size:12px;}
+
+  /* ===== toast ===== */
+  #toast{
+    position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);z-index:100;
+    background:var(--green);color:#0a0d09;font-family:var(--font-display);font-size:11px;
+    padding:14px 20px;border:1px solid #0a0d09;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ===== account menu (connected wallet) ===== */
+  .account-wrap{position:relative;}
+  .account-dropdown{
+    position:absolute;right:0;top:calc(100% + 10px);
+    min-width:170px;background:var(--bg-panel);
+    border:1px solid var(--green-dim);
+    display:none;flex-direction:column;z-index:200;
+  }
+  .account-dropdown.open{display:flex;}
+  .account-dropdown a,.account-dropdown button{
+    text-align:left;background:none;border:none;width:100%;
+    color:var(--white);padding:12px 14px;
+    font-family:var(--font-display);font-size:9.5px;letter-spacing:.5px;
+    border-bottom:1px solid var(--green-faint);
+  }
+  .account-dropdown a:last-child,.account-dropdown button:last-child{border-bottom:none;}
+  .account-dropdown a:hover,.account-dropdown button:hover{background:var(--green-faint);color:var(--green);}
+  .account-dropdown button.disconnect{color:#ff5d5d;}
+  .account-dropdown button.disconnect:hover{background:rgba(255,93,93,.12);color:#ff5d5d;}
+
+  @media(max-width:920px){
+    nav{display:none;}
+    .intro-title{font-size:22px;}
+    .top-grid{grid-template-columns:1fr;}
+    .how-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:520px){
+    .how-grid{grid-template-columns:1fr;}
+    .epoch-meta{gap:22px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="frame topbar">
+    <a href="index.html" class="logo"><span class="logo-mark">K</span> KEYVRA</a>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="epoch.html" class="active">EPOCH</a>
+      <a href="stake.html">STAKE</a>
+      <a href="docs.html">DOCS</a>
+    </nav>
+    <div id="walletArea"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <h1 class="intro-title">EPOCH</h1>
+    <hr class="intro-rule">
+    <p class="intro-sub">Every epoch creates a new staking cycle.</p>
+  </div>
+
+  <!-- CURRENT EPOCH + REWARD POOL -->
+  <section>
+    <div class="section-head">CURRENT EPOCH<div class="rule"></div></div>
+    <div class="top-grid">
+      <div class="frame epoch-panel">
+        <div class="epoch-head">
+          <div>
+            <div class="k">EPOCH</div>
+            <div class="epoch-number">#001</div>
+          </div>
+          <span class="soon-badge">COMING SOON</span>
+        </div>
+        <div class="epoch-meta">
+          <div class="m">
+            <div class="label">START</div>
+            <div class="value">—</div>
+          </div>
+          <div class="m">
+            <div class="label">END</div>
+            <div class="value">—</div>
+          </div>
+          <div class="m">
+            <div class="label">STATUS</div>
+            <div class="value accent">COMING SOON</div>
+          </div>
+        </div>
+      </div>
+      <div class="frame prize-panel">
+        <div>
+          <div class="prize-label">EPOCH REWARD POOL</div>
+          <div class="prize-value">—<span class="unit">KEYVRA</span></div>
+        </div>
+        <p class="prize-note">Prize pool will be determined when the epoch begins.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW AN EPOCH WORKS -->
+  <section>
+    <div class="section-head">HOW AN EPOCH WORKS<div class="rule"></div></div>
+    <div class="how-grid">
+      <div class="frame how-card">
+        <div class="how-num">01</div>
+        <div class="how-title">STAKE</div>
+        <div class="how-desc">Stake KEYVRA to participate.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">02</div>
+        <div class="how-title">BUILD STAKING POWER</div>
+        <div class="how-desc">Your staked KEYVRA determines your staking power.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">03</div>
+        <div class="how-title">EPOCH ENDS</div>
+        <div class="how-desc">The epoch completes its cycle.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">04</div>
+        <div class="how-title">SHARE REWARDS</div>
+        <div class="how-desc">Rewards are distributed based on staking power.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EPOCH HISTORY -->
+  <section>
+    <div class="section-head">EPOCH HISTORY<div class="rule"></div></div>
+    <div class="frame history-frame">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>EPOCH</th>
+            <th>STATUS</th>
+            <th>REWARD POOL</th>
+            <th>START</th>
+            <th>END</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>#001</td>
+            <td><span class="soon-badge">COMING SOON</span></td>
+            <td class="dim">—</td>
+            <td class="dim">—</td>
+            <td class="dim">—</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="frame">
+    <div>
+      <div class="foot-logo">KEYVRA</div>
+      <div class="foot-copy">© 2026 KEYVRA</div>
+    </div>
+    <div class="foot-links">
+      <a href="index.html">HOME</a><a href="epoch.html">EPOCH</a><a href="stake.html">STAKE</a><a href="docs.html">DOCS</a>
+    </div>
+    <div class="foot-icons">
+      <span>✕</span><span>◎ DOCS</span>
+    </div>
+  </footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+
+</script>
+<script src="wallet.js"></script>
+</body>
+</html>

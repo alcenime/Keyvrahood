@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEYVRA Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d09;
+    --bg-panel:#0c110b;
+    --green:#c6ff3d;
+    --green-soft:#9fe62f;
+    --green-dim:rgba(198,255,61,.35);
+    --green-faint:rgba(198,255,61,.14);
+    --white:#f2f5ec;
+    --grey:#8a9483;
+    --font-display:'Press Start 2P', monospace;
+    --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--bg);}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:var(--font-mono);
+    line-height:1.5;
+    padding:14px;
+    min-height:100vh;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1120px;margin:0 auto;}
+
+  /* corner-bracket frame, reused everywhere */
+  .frame{
+    position:relative;
+    border:1px solid var(--green-dim);
+    background:var(--bg-panel);
+  }
+  .frame::before,.frame::after{
+    content:"";
+    position:absolute;
+    width:14px;height:14px;
+    pointer-events:none;
+  }
+  .frame::before{ /* top-left */
+    top:-1px;left:-1px;
+    border-top:2px solid var(--green);
+    border-left:2px solid var(--green);
+  }
+  .frame::after{ /* bottom-right */
+    bottom:-1px;right:-1px;
+    border-bottom:2px solid var(--green);
+    border-right:2px solid var(--green);
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);
+    font-size:20px;letter-spacing:1px;color:var(--white);
+  }
+  .logo-mark{
+    width:30px;height:30px;background:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    clip-path:polygon(30% 0,100% 0,70% 100%,0 100%);
+    color:#0a0d09;font-size:14px;
+  }
+  nav{display:flex;gap:34px;}
+  nav a{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:1px;color:var(--white);
+    padding-bottom:8px;position:relative;
+  }
+  nav a.active{color:var(--green);}
+  nav a.active::after{
+    content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--green);
+  }
+  .wallet-btn{
+    font-family:var(--font-display);
+    font-size:10px;letter-spacing:.5px;
+    color:var(--green);
+    border:1px solid var(--green-dim);
+    padding:12px 18px;
+    display:flex;align-items:center;gap:10px;
+    background:var(--bg-panel);
+    cursor:pointer;
+  }
+
+  /* ===== hero ===== */
+  .hero{
+    position:relative;
+    padding:60px 40px 50px;
+    overflow:hidden;
+    margin-top:6px;
+  }
+  .hero-title{
+    font-family:var(--font-display);
+    font-size:46px;line-height:1.25;
+    letter-spacing:1px;
+  }
+  .hero-title .accent{color:var(--green);}
+  .hero-sub{
+    margin-top:16px;color:var(--grey);
+    font-size:15px;max-width:420px;
+  }
+  .hero-graphic{
+    position:absolute;right:60px;top:36px;width:190px;height:190px;
+    color:var(--green);opacity:.9;
+  }
+  .plus{position:absolute;color:var(--green);opacity:.7;font-size:18px;}
+
+  /* ===== tab strip ===== */
+  .tabstrip{
+    display:flex;flex-wrap:wrap;
+    margin-top:26px;
+    padding:10px;
+  }
+  .tabstrip button{
+    font-family:var(--font-display);
+    font-size:10px;letter-spacing:.5px;
+    background:transparent;border:none;color:var(--white);
+    padding:14px 20px;cursor:pointer;
+    display:flex;align-items:center;gap:8px;
+    opacity:.75;
+  }
+  .tabstrip button:hover{opacity:1;}
+  .tabstrip button.active{
+    background:var(--green);color:#0a0d09;opacity:1;
+  }
+
+  section{margin-top:44px;}
+  .section-head{
+    display:flex;align-items:center;gap:14px;
+    font-family:var(--font-display);
+    font-size:15px;color:var(--green);
+    letter-spacing:1px;
+    padding:0 6px;
+  }
+  .section-head .rule{
+    flex:1;height:0;border-top:1px dashed var(--green-dim);
+  }
+  .section-head .tag{font-size:10px;color:var(--grey);white-space:nowrap;}
+
+  /* ===== about / overview ===== */
+  .about{
+    display:grid;grid-template-columns:1.1fr 1fr;gap:28px;
+    margin-top:22px;padding:0 6px;
+  }
+  .about p{color:var(--grey);font-size:14.5px;margin-top:14px;max-width:34ch;}
+  .about h3{font-family:var(--font-display);font-size:15px;color:var(--white);}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .stat-box{padding:26px 18px;text-align:center;}
+  .stat-box svg{margin:0 auto 14px;color:var(--green);}
+  .stat-box .label{font-size:11px;color:var(--grey);letter-spacing:.5px;}
+  .stat-box .value{
+    font-family:var(--font-display);
+    font-size:14px;color:var(--white);margin-top:10px;line-height:1.6;
+  }
+
+  /* ===== 4-card grids (principles / steps / roadmap) ===== */
+  .card-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:14px;
+  }
+  .card{padding:20px 16px;}
+  .card .num{
+    font-family:var(--font-display);font-size:10px;color:var(--green);
+    border:1px solid var(--green-dim);display:inline-block;padding:4px 6px;
+  }
+  .card .icon{margin:16px 0;color:var(--green);}
+  .card h4{
+    font-family:var(--font-display);font-size:11px;line-height:1.6;
+    letter-spacing:.5px;margin-bottom:10px;
+  }
+  .card p{color:var(--grey);font-size:13px;}
+  .card .status-pill{
+    display:inline-block;margin-top:10px;font-family:var(--font-display);
+    font-size:9px;color:var(--green);border:1px solid var(--green-dim);
+    padding:5px 8px;letter-spacing:.5px;
+  }
+
+  /* ===== epoch status ===== */
+  .epoch-status{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch;
+  }
+  .epoch-status p{color:var(--grey);font-size:14.5px;margin-top:14px;max-width:36ch;}
+  .epoch-status ul{margin-top:14px;padding-left:18px;color:var(--grey);font-size:14px;}
+  .epoch-status li{margin-bottom:6px;}
+  .epoch-card{
+    padding:34px 24px;text-align:center;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;
+  }
+  .epoch-card .epoch-num{font-family:var(--font-display);font-size:22px;color:var(--white);}
+  .epoch-card .epoch-status-tag{
+    font-family:var(--font-display);font-size:12px;color:#0a0d09;
+    background:var(--green);padding:10px 16px;letter-spacing:1px;
+  }
+
+  /* ===== flow diagram ===== */
+  .flow{
+    margin-top:26px;padding:20px 6px;
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+  }
+  .flow-step{
+    font-family:var(--font-display);font-size:11px;letter-spacing:.5px;
+    padding:14px 26px;color:var(--white);width:min(320px,90%);text-align:center;
+  }
+  .flow-arrow{color:var(--green);font-size:16px;line-height:1;}
+
+  /* ===== formula box ===== */
+  .formula-wrap{margin-top:22px;padding:0 6px;}
+  .formula-box{
+    padding:30px 22px;text-align:center;
+    font-family:var(--font-mono);font-size:15px;color:var(--green);
+    line-height:1.9;
+  }
+  .formula-box .op{color:var(--white);}
+  .formula-note{color:var(--grey);font-size:14px;margin-top:16px;max-width:60ch;}
+  .formula-note + .formula-note{margin-top:10px;}
+
+  /* ===== simple text section ===== */
+  .textblock{margin-top:22px;padding:0 6px;max-width:70ch;}
+  .textblock p{color:var(--grey);font-size:14.5px;margin-top:12px;}
+
+  /* ===== tokenomics rows ===== */
+  .tok-panel{margin-top:22px;padding:22px;margin-left:6px;margin-right:6px;}
+  .tok-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:12px 4px;border-bottom:1px dashed var(--green-faint);
+    font-size:13.5px;
+  }
+  .tok-row:last-of-type{border-bottom:none;}
+  .tok-row .v{
+    font-family:var(--font-display);font-size:9.5px;color:var(--grey);
+    letter-spacing:.5px;border:1px solid var(--green-dim);padding:5px 8px;
+  }
+  .tok-note{color:var(--grey);font-size:13px;margin-top:14px;padding:0 4px;}
+
+  /* ===== footer ===== */
+  footer{
+    margin-top:50px;padding:26px 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    border-top:1px solid var(--green-dim);
+  }
+  .foot-logo{font-family:var(--font-display);font-size:14px;color:var(--green);}
+  .foot-copy{font-size:11px;color:var(--grey);margin-top:4px;}
+  .foot-links{display:flex;gap:18px;font-size:12px;color:var(--grey);flex-wrap:wrap;}
+  .foot-icons{display:flex;gap:16px;align-items:center;color:var(--grey);font-size:12px;}
+
+  .placeholder{padding:60px 30px;text-align:center;color:var(--grey);}
+  .placeholder h3{font-family:var(--font-display);color:var(--green);font-size:14px;margin-bottom:14px;}
+
+  /* ===== account menu (connected wallet) ===== */
+  .account-wrap{position:relative;}
+  .account-dropdown{
+    position:absolute;right:0;top:calc(100% + 10px);
+    min-width:170px;background:var(--bg-panel);
+    border:1px solid var(--green-dim);
+    display:none;flex-direction:column;z-index:200;
+  }
+  .account-dropdown.open{display:flex;}
+  .account-dropdown a,.account-dropdown button{
+    text-align:left;background:none;border:none;width:100%;
+    color:var(--white);padding:12px 14px;
+    font-family:var(--font-display);font-size:9.5px;letter-spacing:.5px;
+    border-bottom:1px solid var(--green-faint);
+  }
+  .account-dropdown a:last-child,.account-dropdown button:last-child{border-bottom:none;}
+  .account-dropdown a:hover,.account-dropdown button:hover{background:var(--green-faint);color:var(--green);}
+  .account-dropdown button.disconnect{color:#ff5d5d;}
+  .account-dropdown button.disconnect:hover{background:rgba(255,93,93,.12);color:#ff5d5d;}
+
+  /* ===== toast ===== */
+  #toast{
+    position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);z-index:100;
+    background:var(--green);color:#0a0d09;font-family:var(--font-display);font-size:11px;
+    padding:14px 20px;border:1px solid #0a0d09;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  @media(max-width:920px){
+    nav{display:none;}
+    .hero-graphic{display:none;}
+    .hero-title{font-size:30px;}
+    .about,.epoch-status{grid-template-columns:1fr;}
+    .card-grid{grid-template-columns:1fr 1fr;}
+    .stat-row{grid-template-columns:1fr;}
+    .tabstrip{overflow-x:auto;flex-wrap:nowrap;}
+  }
+  @media(max-width:560px){
+    .card-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="frame topbar">
+    <a href="index.html" class="logo"><span class="logo-mark">K</span> KEYVRA</a>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="epoch.html">EPOCH</a>
+      <a href="stake.html">STAKE</a>
+      <a href="docs.html" class="active">DOCS</a>
+    </nav>
+    <div id="walletArea"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="frame hero">
+    <div class="plus" style="top:26px;left:46%;">+</div>
+    <div class="plus" style="top:70px;left:52%;">+</div>
+    <div class="plus" style="top:120px;left:60%;">+</div>
+    <div class="plus" style="top:36px;left:82%;">+</div>
+    <div class="plus" style="top:150px;left:88%;">+</div>
+    <h1 class="hero-title">KEYVRA <span class="accent">DOCS</span></h1>
+    <p class="hero-sub">Documentation for the KEYVRA staking protocol.</p>
+    <svg class="hero-graphic" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2">
+      <polygon points="50,4 90,27 90,73 50,96 10,73 10,27" />
+      <polygon points="50,22 74,36 74,64 50,78 26,64 26,36" />
+      <line x1="50" y1="4" x2="50" y2="22" />
+      <line x1="90" y1="27" x2="74" y2="36" />
+      <line x1="90" y1="73" x2="74" y2="64" />
+      <line x1="50" y1="96" x2="50" y2="78" />
+      <line x1="10" y1="73" x2="26" y2="64" />
+      <line x1="10" y1="27" x2="26" y2="36" />
+      <text x="50" y="55" text-anchor="middle" font-size="14" stroke="none" fill="currentColor" font-family="'Press Start 2P',monospace">TH</text>
+    </svg>
+  </div>
+
+  <!-- TAB STRIP -->
+  <div class="frame tabstrip">
+    <button class="active" data-tab="overview">◧ OVERVIEW</button>
+    <button data-tab="how">HOW IT WORKS</button>
+    <button data-tab="epochs">EPOCHS</button>
+    <button data-tab="tokenomics">TOKENOMICS</button>
+    <button data-tab="roadmap">ROADMAP</button>
+  </div>
+
+  <!-- ===== OVERVIEW TAB ===== -->
+  <div id="tab-overview">
+
+    <section>
+      <div class="section-head">WHAT IS KEYVRA?<div class="rule"></div></div>
+      <div class="about">
+        <div>
+          <p>KEYVRA is an epoch-based staking protocol built on Robinhood Chain.</p>
+          <p>Users stake KEYVRA to gain staking power and participate in recurring epoch reward cycles.</p>
+          <p>Each epoch creates a new opportunity for stakers to participate in the protocol's rewards.</p>
+        </div>
+        <div class="stat-row">
+          <div class="frame stat-box">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <div class="label">STAKING ASSET</div>
+            <div class="value">KEYVRA</div>
+          </div>
+          <div class="frame stat-box">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg>
+            <div class="label">STAKING POWER</div>
+            <div class="value">1 KEYVRA<br>= 1 TH</div>
+          </div>
+          <div class="frame stat-box">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"/></svg>
+            <div class="label">NETWORK</div>
+            <div class="value">ROBINHOOD<br>CHAIN</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">KEY PRINCIPLES<div class="rule"></div></div>
+      <div class="card-grid">
+        <div class="frame card">
+          <span class="num">01</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg></div>
+          <h4>STAKE KEYVRA</h4>
+          <p>Stake your KEYVRA to participate in the staking system.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">02</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h4>1 KEYVRA = 1 TH</h4>
+          <p>Every KEYVRA staked represents 1 TH of staking power.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">03</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6"/></svg></div>
+          <h4>EVERY EPOCH</h4>
+          <p>Staking operates through recurring epochs.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">04</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7C10 3 4 3 4 7s6 4 8 0zM12 7c2-4 8-4 8 0s-6 4-8 0z"/></svg></div>
+          <h4>SHARE REWARDS</h4>
+          <p>At the end of an epoch, rewards are distributed according to staking power.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== HOW IT WORKS TAB ===== -->
+  <div id="tab-how" style="display:none;">
+
+    <section style="margin-top:0;">
+      <div class="section-head">HOW KEYVRA WORKS<div class="rule"></div></div>
+      <div class="card-grid">
+        <div class="frame card">
+          <span class="num">01</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg></div>
+          <h4>STAKE</h4>
+          <p>Stake KEYVRA when staking is live.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">02</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+          <h4>EARN STAKING POWER</h4>
+          <p>Every 1 KEYVRA staked represents 1 TH.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">03</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l6-6 4 4 8-8M21 7v6h-6"/></svg></div>
+          <h4>PARTICIPATE IN THE EPOCH</h4>
+          <p>Your staking power participates in the epoch reward cycle.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">04</span>
+          <div class="icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <h4>CLAIM YOUR REWARD</h4>
+          <p>After the epoch ends, eligible rewards can be claimed.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">REWARD MECHANISM<div class="rule"></div></div>
+      <div class="formula-wrap">
+        <div class="frame formula-box">
+          User Reward =<br>
+          <span class="op">(</span>User Staking Power / Total Staking Power<span class="op">)</span><br>
+          <span class="op">×</span> Epoch Reward Pool
+        </div>
+        <p class="formula-note">Because 1 KEYVRA = 1 TH, staking power can be represented directly by the amount of KEYVRA staked.</p>
+        <p class="formula-note">The larger your share of total staking power, the larger your share of the epoch reward pool.</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">STAKING<div class="rule"></div></div>
+      <div class="textblock">
+        <p>KEYVRA staking allows users to stake KEYVRA and participate in epoch-based rewards.</p>
+        <p>Users can stake KEYVRA when staking is live.</p>
+        <p>Users can unstake according to the protocol's staking rules.</p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== EPOCHS TAB ===== -->
+  <div id="tab-epochs" style="display:none;">
+
+    <section style="margin-top:0;">
+      <div class="section-head">EPOCH SYSTEM<div class="rule"></div></div>
+      <div class="epoch-status">
+        <div>
+          <p>KEYVRA organizes staking into recurring epochs.</p>
+          <p>Each epoch has:</p>
+          <ul>
+            <li>A beginning</li>
+            <li>A staking period</li>
+            <li>An end</li>
+            <li>A reward distribution</li>
+          </ul>
+        </div>
+        <div class="frame epoch-card">
+          <div class="epoch-num">EPOCH #001</div>
+          <div class="epoch-status-tag">COMING SOON</div>
+        </div>
+      </div>
+
+      <div class="flow">
+        <div class="frame flow-step">STAKE</div>
+        <div class="flow-arrow">↓</div>
+        <div class="frame flow-step">EPOCH</div>
+        <div class="flow-arrow">↓</div>
+        <div class="frame flow-step">EPOCH ENDS</div>
+        <div class="flow-arrow">↓</div>
+        <div class="frame flow-step">REWARDS</div>
+        <div class="flow-arrow">↓</div>
+        <div class="frame flow-step">CLAIM</div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== TOKENOMICS TAB ===== -->
+  <div id="tab-tokenomics" style="display:none;">
+
+    <section style="margin-top:0;">
+      <div class="section-head">TOKENOMICS<div class="rule"></div></div>
+      <div class="frame tok-panel">
+        <div class="tok-row"><span>Total Supply</span><span class="v">TO BE ANNOUNCED</span></div>
+        <div class="tok-row"><span>Token Allocation</span><span class="v">TO BE ANNOUNCED</span></div>
+        <div class="tok-row"><span>Emissions</span><span class="v">TO BE ANNOUNCED</span></div>
+        <div class="tok-row"><span>Vesting Schedule</span><span class="v">TO BE ANNOUNCED</span></div>
+        <div class="tok-row"><span>Network</span><span class="v">ROBINHOOD CHAIN</span></div>
+      </div>
+      <p class="tok-note">KEYVRA is pre-launch. Tokenomic details will be published as they are finalized.</p>
+    </section>
+
+  </div>
+
+  <!-- ===== ROADMAP TAB ===== -->
+  <div id="tab-roadmap" style="display:none;">
+
+    <section style="margin-top:0;">
+      <div class="section-head">ROADMAP<div class="rule"></div></div>
+      <div class="card-grid">
+        <div class="frame card">
+          <span class="num">01</span>
+          <h4>FOUNDATION</h4>
+          <p>KEYVRA concept and protocol development.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">02</span>
+          <h4>PROTOCOL BUILD</h4>
+          <p>Development of the staking and epoch infrastructure.</p>
+        </div>
+        <div class="frame card">
+          <span class="num">03</span>
+          <h4>EPOCH #001</h4>
+          <p>First KEYVRA epoch.</p>
+          <span class="status-pill">COMING SOON</span>
+        </div>
+        <div class="frame card">
+          <span class="num">04</span>
+          <h4>PROTOCOL EXPANSION</h4>
+          <p>Future development of the KEYVRA ecosystem.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="frame">
+    <div>
+      <div class="foot-logo">KEYVRA</div>
+      <div class="foot-copy">© 2026 KEYVRA</div>
+    </div>
+    <div class="foot-links">
+      <a href="index.html">HOME</a><a href="epoch.html">EPOCH</a><a href="stake.html">STAKE</a><a href="docs.html">DOCS</a>
+    </div>
+    <div class="foot-icons">
+      <a href="https://x.com/keyvraRH">✕ @keyvraRH</a>
+    </div>
+  </footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  function selectTab(name){
+    document.querySelectorAll('[id^="tab-"]').forEach(el=>{
+      el.style.display = (el.id === 'tab-'+name) ? '' : 'none';
+    });
+    document.querySelectorAll('.tabstrip button').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tab === name);
+    });
+  }
+  document.querySelectorAll('.tabstrip button').forEach(btn=>{
+    btn.addEventListener('click', ()=> selectTab(btn.dataset.tab));
+  });
+
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+</script>
+<script src="wallet.js"></script>
+</body>
+</html>

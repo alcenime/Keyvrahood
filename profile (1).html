@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEYVRA — Profile</title>
+<meta name="description" content="Your KEYVRA wallet, stake, and rewards.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d09;
+    --bg-panel:#0c110b;
+    --green:#c6ff3d;
+    --green-soft:#9fe62f;
+    --green-dim:rgba(198,255,61,.35);
+    --green-faint:rgba(198,255,61,.14);
+    --white:#f2f5ec;
+    --grey:#8a9483;
+    --danger:#ff5d5d;
+    --font-display:'Press Start 2P', monospace;
+    --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--bg);overflow-x:hidden;}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:var(--font-mono);
+    line-height:1.5;
+    padding:14px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:1120px;margin:0 auto;}
+  .hidden{display:none !important;}
+
+  /* corner-bracket frame, reused everywhere */
+  .frame{
+    position:relative;
+    border:1px solid var(--green-dim);
+    background:var(--bg-panel);
+  }
+  .frame::before,.frame::after{
+    content:"";
+    position:absolute;
+    width:14px;height:14px;
+    pointer-events:none;
+  }
+  .frame::before{
+    top:-1px;left:-1px;
+    border-top:2px solid var(--green);
+    border-left:2px solid var(--green);
+  }
+  .frame::after{
+    bottom:-1px;right:-1px;
+    border-bottom:2px solid var(--green);
+    border-right:2px solid var(--green);
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);
+    font-size:20px;letter-spacing:1px;color:var(--white);
+  }
+  .logo-mark{
+    width:30px;height:30px;background:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    clip-path:polygon(30% 0,100% 0,70% 100%,0 100%);
+    color:#0a0d09;font-size:14px;
+  }
+  nav{display:flex;gap:34px;}
+  nav a{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:1px;color:var(--white);
+    padding-bottom:8px;position:relative;
+  }
+  nav a.active{color:var(--green);}
+  nav a.active::after{
+    content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--green);
+  }
+  .wallet-btn{
+    font-family:var(--font-display);
+    font-size:10px;letter-spacing:.5px;
+    color:var(--green);
+    border:1px solid var(--green-dim);
+    padding:12px 18px;
+    display:flex;align-items:center;gap:10px;
+    background:var(--bg-panel);
+  }
+  .wallet-btn:hover{border-color:var(--green);}
+
+  /* ===== account menu (connected wallet) ===== */
+  .account-wrap{position:relative;}
+  .account-dropdown{
+    position:absolute;right:0;top:calc(100% + 10px);
+    min-width:170px;background:var(--bg-panel);
+    border:1px solid var(--green-dim);
+    display:none;flex-direction:column;z-index:200;
+  }
+  .account-dropdown.open{display:flex;}
+  .account-dropdown a,.account-dropdown button{
+    text-align:left;background:none;border:none;width:100%;
+    color:var(--white);padding:12px 14px;
+    font-family:var(--font-display);font-size:9.5px;letter-spacing:.5px;
+    border-bottom:1px solid var(--green-faint);
+  }
+  .account-dropdown a:last-child,.account-dropdown button:last-child{border-bottom:none;}
+  .account-dropdown a:hover,.account-dropdown button:hover{background:var(--green-faint);color:var(--green);}
+  .account-dropdown button.disconnect{color:var(--danger);}
+  .account-dropdown button.disconnect:hover{background:rgba(255,93,93,.12);color:var(--danger);}
+
+  /* ===== page intro ===== */
+  .intro{padding:40px 26px 6px;}
+  .intro-title{
+    font-family:var(--font-display);
+    font-size:26px;letter-spacing:1px;color:var(--white);
+  }
+  .intro-rule{
+    border:none;border-top:2px dashed var(--green-dim);
+    width:100px;margin:16px 0 14px;
+  }
+  .intro-sub{color:var(--grey);font-size:13.5px;max-width:480px;}
+
+  section{margin-top:44px;}
+  .section-head{
+    display:flex;align-items:center;gap:14px;
+    font-family:var(--font-display);
+    font-size:15px;color:var(--green);
+    letter-spacing:1px;
+    padding:0 6px;
+  }
+  .section-head .rule{flex:1;height:0;border-top:1px dashed var(--green-dim);}
+  .section-head .tag{font-family:var(--font-mono);font-size:10px;color:var(--grey);white-space:nowrap;}
+
+  /* ===== gate (not connected) ===== */
+  .gate-panel{
+    margin-top:22px;padding:48px 26px;text-align:center;
+  }
+  .gate-title{
+    font-family:var(--font-display);font-size:15px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:14px;
+  }
+  .gate-sub{color:var(--grey);font-size:13px;max-width:38ch;margin:0 auto 26px;line-height:1.7;}
+  .hero-btn{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:.5px;
+    color:#0a0d09;background:var(--green);
+    border:none;padding:16px 22px;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .hero-btn:hover{background:var(--green-soft);}
+
+  /* ===== 2-col grid ===== */
+  .row-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:stretch;
+  }
+  .panel{padding:24px;}
+  .panel-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;padding-bottom:12px;
+    border-bottom:1px dashed var(--green-faint);
+  }
+  .panel-head h2{
+    font-family:var(--font-display);font-size:12px;color:var(--white);letter-spacing:1px;
+  }
+  .panel-head .idx{font-size:11px;color:var(--green-soft);}
+
+  /* wallet panel */
+  .wallet-body{display:flex;align-items:center;gap:16px;}
+  .wallet-avatar{
+    width:44px;height:44px;border:1px solid var(--green);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .wallet-info{flex:1;}
+  .wallet-address{
+    font-family:var(--font-display);font-size:12px;letter-spacing:.5px;color:var(--white);
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .copy-btn{
+    background:transparent;border:1px solid var(--green-dim);color:var(--green);
+    font-family:var(--font-display);font-size:9px;padding:5px 8px;letter-spacing:.5px;
+  }
+  .copy-btn:hover{background:var(--green-faint);}
+  .wallet-status{
+    margin-top:10px;font-size:11px;color:var(--green);letter-spacing:.5px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .dot{width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;}
+  .wallet-meta{
+    margin-top:18px;padding-top:16px;border-top:1px dashed var(--green-faint);
+    display:flex;justify-content:space-between;font-size:11px;
+  }
+  .wallet-meta .label{color:var(--grey);letter-spacing:1px;}
+  .wallet-meta .value{color:var(--white);letter-spacing:.5px;}
+
+  /* asset list */
+  .asset-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:13px 2px;border-bottom:1px dashed var(--green-faint);font-size:13px;
+  }
+  .asset-row:last-child{border-bottom:none;}
+  .asset-name{display:flex;align-items:center;gap:10px;color:var(--white);}
+  .asset-glyph{width:8px;height:8px;background:var(--green);display:inline-block;}
+  .asset-balance{color:var(--grey);}
+
+  /* metrics grid (staking overview) */
+  .metrics-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+  }
+  .metric{padding:22px 18px;text-align:center;}
+  .m-label{font-size:10.5px;color:var(--grey);letter-spacing:1px;margin-bottom:12px;}
+  .m-value{font-family:var(--font-display);font-size:20px;color:var(--white);}
+  .m-unit{font-size:10px;color:var(--green);margin-top:6px;letter-spacing:.5px;}
+  .status-tag{
+    display:inline-block;margin-top:6px;font-family:var(--font-display);font-size:9px;
+    color:var(--green);border:1px solid var(--green-dim);padding:4px 8px;letter-spacing:.5px;
+  }
+  .m-note{font-size:10px;color:var(--grey);margin-top:12px;letter-spacing:.5px;}
+
+  /* rewards */
+  .rewards-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px;}
+  .reward-card{
+    border:1px dashed var(--green-dim);padding:18px;text-align:center;
+  }
+  .reward-card .m-label{margin-bottom:10px;}
+  .reward-card .m-value{font-size:15px;}
+  .claim-btn{
+    width:100%;font-family:var(--font-display);font-size:11px;letter-spacing:.5px;
+    color:var(--grey);background:var(--bg);border:1px solid var(--green-dim);padding:15px;
+  }
+  .claim-btn[disabled]{opacity:.5;cursor:not-allowed;}
+
+  /* history table */
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    font-family:var(--font-display);font-size:9px;letter-spacing:.5px;color:var(--grey);
+    text-align:left;padding:10px 6px;border-bottom:1px dashed var(--green-dim);
+  }
+  tbody td{padding:10px 6px;font-size:12.5px;color:var(--white);}
+  .table-empty td{text-align:center;padding:34px 10px;color:var(--grey);}
+  .table-empty h3{
+    font-family:var(--font-display);font-size:11px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:10px;
+  }
+  .table-empty p{font-size:11px;color:var(--grey);}
+
+  /* ===== footer ===== */
+  footer{
+    margin-top:50px;padding:26px 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    border-top:1px solid var(--green-dim);
+  }
+  .foot-logo{font-family:var(--font-display);font-size:14px;color:var(--green);}
+  .foot-copy{font-size:11px;color:var(--grey);margin-top:4px;}
+  .foot-links{display:flex;gap:18px;font-size:12px;color:var(--grey);flex-wrap:wrap;}
+  .foot-icons{display:flex;gap:16px;align-items:center;color:var(--grey);font-size:12px;}
+
+  /* ===== toast ===== */
+  #toast{
+    position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);z-index:100;
+    background:var(--green);color:#0a0d09;font-family:var(--font-display);font-size:11px;
+    padding:14px 20px;border:1px solid #0a0d09;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  @media(max-width:920px){
+    nav{display:none;}
+    .intro-title{font-size:22px;}
+    .row-grid{grid-template-columns:1fr;}
+    .metrics-grid{grid-template-columns:1fr;}
+  }
+  @media(max-width:520px){
+    .rewards-grid{grid-template-columns:1fr;}
+    .wallet-body{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="frame topbar">
+    <a href="index.html" class="logo"><span class="logo-mark">K</span> KEYVRA</a>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="epoch.html">EPOCH</a>
+      <a href="stake.html">STAKE</a>
+      <a href="docs.html">DOCS</a>
+    </nav>
+    <div id="walletArea"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="intro">
+    <h1 class="intro-title">PROFILE</h1>
+    <hr class="intro-rule">
+    <p class="intro-sub">Manage your wallet. Track your stake. View your rewards.</p>
+  </div>
+
+  <!-- GATE: shown when wallet is not connected -->
+  <section id="profileGate">
+    <div class="frame gate-panel">
+      <div class="gate-title">WALLET NOT CONNECTED</div>
+      <p class="gate-sub">Connect your wallet to view your KEYVRA profile.</p>
+      <button class="hero-btn" id="profileConnectBtn">▤ CONNECT WALLET</button>
+    </div>
+  </section>
+
+  <!-- CONTENT: shown once wallet is connected -->
+  <div id="profileContent" class="hidden">
+
+    <!-- WALLET + ASSETS -->
+    <section>
+      <div class="section-head">WALLET<div class="rule"></div></div>
+      <div class="row-grid">
+        <div class="frame panel">
+          <div class="panel-head">
+            <h2>WALLET</h2>
+            <span class="idx">// 01</span>
+          </div>
+          <div class="wallet-body">
+            <div class="wallet-avatar">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.5"><rect x="3" y="3" width="18" height="18"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="wallet-info">
+              <div class="wallet-address">
+                <span id="profileAddress">0x7A3F...42F1</span>
+                <button class="copy-btn" id="copyAddrBtn">COPY</button>
+              </div>
+              <div class="wallet-status"><span class="dot"></span> WALLET CONNECTED</div>
+            </div>
+          </div>
+          <div class="wallet-meta">
+            <span class="label">NETWORK</span>
+            <span class="value">ROBINHOOD CHAIN</span>
+          </div>
+        </div>
+
+        <div class="frame panel">
+          <div class="panel-head">
+            <h2>ASSETS</h2>
+            <span class="idx">// 02</span>
+          </div>
+          <div class="asset-row">
+            <span class="asset-name"><span class="asset-glyph"></span>KEYVRA</span>
+            <span class="asset-balance">0 KEYVRA</span>
+          </div>
+          <div class="asset-row">
+            <span class="asset-name"><span class="asset-glyph"></span>USDG</span>
+            <span class="asset-balance">0 USDG</span>
+          </div>
+          <div class="asset-row">
+            <span class="asset-name"><span class="asset-glyph"></span>ETH</span>
+            <span class="asset-balance">0 ETH</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STAKING OVERVIEW -->
+    <section>
+      <div class="section-head">STAKING OVERVIEW<div class="rule"></div></div>
+      <div class="frame" style="margin-top:0;padding:24px;">
+        <div class="panel-head">
+          <h2>STAKING OVERVIEW</h2>
+          <span class="idx">// 03</span>
+        </div>
+        <div class="metrics-grid" style="margin-top:0;padding:0;">
+          <div class="frame metric">
+            <div class="m-label">YOUR STAKE</div>
+            <div class="m-value">0</div>
+            <div class="m-unit">KEYVRA</div>
+          </div>
+          <div class="frame metric">
+            <div class="m-label">STAKING POWER</div>
+            <div class="m-value">0</div>
+            <div class="m-unit">TH — 1 KEYVRA = 1 TH</div>
+          </div>
+          <div class="frame metric">
+            <div class="m-label">CURRENT EPOCH</div>
+            <div class="m-value">#001</div>
+            <div class="status-tag">COMING SOON</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REWARDS + HISTORY -->
+    <section>
+      <div class="section-head">REWARDS &amp; HISTORY<div class="rule"></div></div>
+      <div class="row-grid">
+        <div class="frame panel">
+          <div class="panel-head">
+            <h2>REWARDS</h2>
+            <span class="idx">// 04</span>
+          </div>
+          <div class="rewards-grid">
+            <div class="reward-card">
+              <div class="m-label">PENDING REWARDS</div>
+              <div class="m-value">0 KEYVRA</div>
+            </div>
+            <div class="reward-card">
+              <div class="m-label">CLAIMABLE REWARDS</div>
+              <div class="m-value">0 KEYVRA</div>
+            </div>
+          </div>
+          <button class="claim-btn" disabled>CLAIM REWARDS</button>
+        </div>
+
+        <div class="frame panel">
+          <div class="panel-head">
+            <h2>STAKING HISTORY</h2>
+            <span class="idx">// 05</span>
+          </div>
+          <table>
+            <thead>
+              <tr><th>DATE</th><th>ACTION</th><th>AMOUNT</th><th>EPOCH</th></tr>
+            </thead>
+            <tbody>
+              <tr class="table-empty">
+                <td colspan="4">
+                  <h3>NO STAKING HISTORY</h3>
+                  <p>Your staking activity will appear here.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="frame">
+    <div>
+      <div class="foot-logo">KEYVRA</div>
+      <div class="foot-copy">© 2026 KEYVRA</div>
+    </div>
+    <div class="foot-links">
+      <a href="index.html">HOME</a><a href="epoch.html">EPOCH</a><a href="stake.html">STAKE</a><a href="docs.html">DOCS</a>
+    </div>
+    <div class="foot-icons">
+      <a href="https://x.com/keyvraRH" target="_blank" rel="noopener">✕ @keyvraRH</a>
+    </div>
+  </footer>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+
+  var profileGate = document.getElementById('profileGate');
+  var profileContent = document.getElementById('profileContent');
+
+  function updateProfileView(){
+    var connected = window.KeyvraWallet && window.KeyvraWallet.isConnected();
+    profileGate.classList.toggle('hidden', !!connected);
+    profileContent.classList.toggle('hidden', !connected);
+    if(connected){
+      var addrEl = document.getElementById('profileAddress');
+      if(addrEl) addrEl.textContent = window.KeyvraWallet.getAddress();
+    }
+  }
+
+  window.onWalletChange = function(){ updateProfileView(); };
+  document.addEventListener('DOMContentLoaded', updateProfileView);
+
+  document.getElementById('profileConnectBtn').addEventListener('click', function(){
+    if(window.KeyvraWallet) window.KeyvraWallet.connect();
+  });
+
+  var copyBtn = document.getElementById('copyAddrBtn');
+  copyBtn.addEventListener('click', function(){
+    var addr = (window.KeyvraWallet && window.KeyvraWallet.getAddress()) || '';
+    navigator.clipboard && navigator.clipboard.writeText(addr).catch(function(){});
+    var original = copyBtn.textContent;
+    copyBtn.textContent = 'COPIED';
+    setTimeout(function(){ copyBtn.textContent = original; }, 1200);
+  });
+</script>
+<script src="wallet.js"></script>
+</body>
+</html>
