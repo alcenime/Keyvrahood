@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEYVRA — Stake Your KEYVRA</title>
+<meta name="description" content="Stake KEYVRA on Robinhood Chain. Every KEYVRA = 1 TH of staking power. Epoch #001 is coming soon.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d09;
+    --bg-panel:#0c110b;
+    --green:#c6ff3d;
+    --green-soft:#9fe62f;
+    --green-dim:rgba(198,255,61,.35);
+    --green-faint:rgba(198,255,61,.14);
+    --white:#f2f5ec;
+    --grey:#8a9483;
+    --font-display:'Press Start 2P', monospace;
+    --font-mono:'Space Mono', monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{background:var(--bg);overflow-x:hidden;}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:var(--font-mono);
+    line-height:1.5;
+    padding:14px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:1120px;margin:0 auto;}
+
+  /* corner-bracket frame, reused everywhere */
+  .frame{
+    position:relative;
+    border:1px solid var(--green-dim);
+    background:var(--bg-panel);
+  }
+  .frame::before,.frame::after{
+    content:"";
+    position:absolute;
+    width:14px;height:14px;
+    pointer-events:none;
+  }
+  .frame::before{ /* top-left */
+    top:-1px;left:-1px;
+    border-top:2px solid var(--green);
+    border-left:2px solid var(--green);
+  }
+  .frame::after{ /* bottom-right */
+    bottom:-1px;right:-1px;
+    border-bottom:2px solid var(--green);
+    border-right:2px solid var(--green);
+  }
+
+  /* ===== top bar ===== */
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 22px;
+  }
+  .logo{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);
+    font-size:20px;letter-spacing:1px;color:var(--white);
+  }
+  .logo-mark{
+    width:30px;height:30px;background:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    clip-path:polygon(30% 0,100% 0,70% 100%,0 100%);
+    color:#0a0d09;font-size:14px;
+  }
+  nav{display:flex;gap:34px;}
+  nav a{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:1px;color:var(--white);
+    padding-bottom:8px;position:relative;
+  }
+  nav a.active{color:var(--green);}
+  nav a.active::after{
+    content:"";position:absolute;left:0;bottom:0;width:100%;height:2px;background:var(--green);
+  }
+  .wallet-btn{
+    font-family:var(--font-display);
+    font-size:10px;letter-spacing:.5px;
+    color:var(--green);
+    border:1px solid var(--green-dim);
+    padding:12px 18px;
+    display:flex;align-items:center;gap:10px;
+    background:var(--bg-panel);
+  }
+  .wallet-btn:hover{border-color:var(--green);}
+
+  /* ===== hero ===== */
+  .hero{
+    position:relative;
+    padding:44px 40px 36px;
+    overflow:hidden;
+    margin-top:6px;
+  }
+  .hero-title{
+    font-family:var(--font-display);
+    font-size:36px;line-height:1.25;
+    letter-spacing:1px;
+  }
+  .hero-title .accent{color:var(--green);display:block;}
+  .hero-subtitle{
+    font-family:var(--font-display);
+    font-size:13px;color:var(--green);
+    margin-top:8px;letter-spacing:.5px;
+  }
+  .hero-rule{
+    border:none;border-top:2px dashed var(--green-dim);
+    width:100px;margin:8px 0 8px;
+  }
+  .hero-sub{
+    color:var(--grey);
+    font-size:14.5px;max-width:440px;margin-bottom:10px;
+  }
+  .hero-btn{
+    font-family:var(--font-display);
+    font-size:11px;letter-spacing:.5px;
+    color:#0a0d09;background:var(--green);
+    border:none;padding:12px 20px;
+    display:inline-flex;align-items:center;gap:10px;
+  }
+  .hero-btn:hover{background:var(--green-soft);}
+  .hero-tv{
+    position:absolute;right:60px;top:30px;width:210px;
+  }
+  .plus{position:absolute;color:var(--green);opacity:.7;font-size:18px;}
+
+  section{margin-top:44px;}
+  .section-head{
+    display:flex;align-items:center;gap:14px;
+    font-family:var(--font-display);
+    font-size:15px;color:var(--green);
+    letter-spacing:1px;
+    padding:0 6px;
+  }
+  .section-head .rule{
+    flex:1;height:0;border-top:1px dashed var(--green-dim);
+  }
+  .section-head .tag{
+    font-family:var(--font-mono);
+    font-size:10px;color:var(--grey);white-space:nowrap;
+  }
+
+  /* ===== mechanism flow ===== */
+  .flow-strip{
+    margin-top:22px;padding:20px 22px;
+    display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+    justify-content:center;
+  }
+  .flow-step{
+    font-family:var(--font-display);
+    font-size:9.5px;letter-spacing:.5px;color:var(--white);
+    border:1px solid var(--green-dim);
+    padding:9px 12px;background:var(--bg);
+    white-space:nowrap;
+  }
+  .flow-step.accent{color:var(--green);border-color:var(--green);}
+  .flow-arrow{color:var(--green-dim);font-size:14px;}
+
+  /* ===== how it works ===== */
+  .how-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:18px;
+  }
+  .how-card{padding:22px 18px;}
+  .how-num{
+    font-family:var(--font-display);font-size:20px;color:var(--green-dim);
+    margin-bottom:14px;
+  }
+  .how-title{
+    font-family:var(--font-display);font-size:12px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:10px;
+  }
+  .how-desc{font-size:12.5px;color:var(--grey);line-height:1.55;}
+
+  /* ===== epoch + prize grid ===== */
+  .top-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:1.3fr 1fr;gap:20px;
+    align-items:stretch;
+  }
+  .epoch-panel{padding:26px;}
+  .epoch-head{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .epoch-head .k{font-size:11px;color:var(--grey);letter-spacing:1px;}
+  .live-badge{
+    font-family:var(--font-display);font-size:8px;letter-spacing:1px;
+    color:#0a0d09;background:var(--green);padding:4px 8px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .live-badge .dot{width:5px;height:5px;background:#0a0d09;border-radius:50%;animation:blink 1.4s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+  .soon-badge{
+    font-family:var(--font-display);font-size:8px;letter-spacing:1px;
+    color:var(--green);background:transparent;border:1px solid var(--green-dim);
+    padding:4px 8px;display:inline-flex;align-items:center;gap:6px;
+  }
+  .epoch-number{
+    font-family:var(--font-display);font-size:32px;color:var(--white);
+  }
+  .epoch-row{
+    display:flex;align-items:baseline;justify-content:space-between;
+    margin-top:22px;flex-wrap:wrap;gap:14px;
+  }
+  .epoch-ends .label,.epoch-next .label{
+    font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:8px;
+  }
+  .epoch-ends .value{
+    font-family:var(--font-display);font-size:20px;color:var(--green);
+  }
+  .epoch-next .value{
+    font-family:var(--font-display);font-size:20px;color:var(--white);
+  }
+  .epoch-progress{
+    margin-top:22px;
+  }
+  .epoch-track{
+    width:100%;height:8px;background:var(--bg);border:1px solid var(--green-dim);
+    position:relative;
+  }
+  .epoch-fill{
+    height:100%;background:var(--green);width:0%;
+    transition:width .6s ease;
+  }
+  .epoch-caption{
+    display:flex;justify-content:space-between;
+    font-size:10px;color:var(--grey);margin-top:8px;letter-spacing:.5px;
+  }
+
+  .prize-panel{padding:26px;display:flex;flex-direction:column;justify-content:space-between;}
+  .prize-label{font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:14px;}
+  .prize-value{
+    font-family:var(--font-display);font-size:26px;color:var(--green);line-height:1.4;
+  }
+  .prize-value .unit{font-size:11px;color:var(--grey);margin-left:6px;}
+  .prize-note{
+    font-size:12.5px;color:var(--grey);margin-top:18px;max-width:34ch;
+  }
+
+  /* ===== power callout ===== */
+  .power-callout{
+    margin-top:22px;padding:20px 22px;
+    display:flex;align-items:center;justify-content:center;gap:16px;
+    font-family:var(--font-display);
+  }
+  .power-callout .unit-box{
+    font-size:14px;color:var(--white);letter-spacing:.5px;
+  }
+  .power-callout .eq{font-size:16px;color:var(--green-dim);}
+  .power-callout .unit-box.accent{color:var(--green);}
+
+  /* ===== stats row ===== */
+  .stat-row{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:18px;
+  }
+  .stat-box{padding:22px 18px;display:flex;align-items:center;gap:14px;}
+  .stat-box .icon{color:var(--green);flex-shrink:0;}
+  .stat-box .label{font-size:11px;color:var(--grey);letter-spacing:.5px;}
+  .stat-box .value{
+    font-family:var(--font-display);
+    font-size:16px;color:var(--white);margin-top:8px;
+  }
+  .stat-box .value .unit{font-size:10px;color:var(--grey);margin-left:6px;}
+  .stat-box .value.accent{color:var(--green);}
+
+  /* ===== your stake ===== */
+  .stake-panel{margin-top:22px;padding:0 6px;}
+  .stake-card{padding:26px;}
+  .stake-top{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px;
+    align-items:flex-start;
+  }
+  .stake-amount .label{font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:10px;}
+  .stake-amount .value{font-family:var(--font-display);font-size:24px;color:var(--white);}
+  .stake-amount .eq-line{
+    display:flex;align-items:center;gap:10px;margin-top:8px;
+    font-family:var(--font-display);font-size:14px;color:var(--green);
+  }
+  .stake-meta{display:flex;gap:34px;flex-wrap:wrap;}
+  .stake-meta .m{min-width:110px;}
+  .stake-meta .m .label{font-size:10.5px;color:var(--grey);letter-spacing:.5px;margin-bottom:8px;}
+  .stake-meta .m .value{font-family:var(--font-display);font-size:14px;color:var(--white);}
+  .stake-meta .m .value.accent{color:var(--green);}
+  .stake-actions{
+    margin-top:24px;display:flex;gap:14px;flex-wrap:wrap;
+  }
+  .btn{
+    font-family:var(--font-display);font-size:11px;letter-spacing:.5px;
+    padding:15px 20px;border:1px solid var(--green-dim);background:var(--bg);
+    color:var(--white);flex:1;min-width:150px;text-align:center;
+  }
+  .btn.primary{background:var(--green);color:#0a0d09;border:none;}
+  .btn.primary:hover{background:var(--green-soft);}
+  .btn.ghost:hover{border-color:var(--green);color:var(--green);}
+
+  /* ===== bottom 2-col: epoch reward ===== */
+  .bottom-grid{
+    margin-top:22px;padding:0 6px;
+    display:grid;grid-template-columns:1fr;gap:20px;
+    align-items:start;
+  }
+  .panel{padding:24px;}
+  .panel-title{
+    display:flex;align-items:center;gap:10px;
+    font-family:var(--font-display);font-size:13px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:18px;
+  }
+  .panel-title .n{color:var(--green);}
+
+  .pending-box{
+    border:1px dashed var(--green-dim);padding:22px;text-align:center;margin-bottom:14px;
+  }
+  .pending-label{
+    font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:10px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .pending-value{
+    font-family:var(--font-display);font-size:30px;color:var(--white);
+  }
+  .pending-value .unit{font-size:13px;color:var(--green);margin-left:8px;}
+
+  .claim-btn{
+    width:100%;font-family:var(--font-display);font-size:12px;letter-spacing:.5px;
+    color:#0a0d09;background:var(--green);border:none;padding:16px;
+  }
+  .claim-btn:hover{background:var(--green-soft);}
+  .claim-note{font-size:11px;color:var(--grey);margin-top:12px;text-align:center;}
+
+  /* ===== footer ===== */
+  footer{
+    margin-top:50px;padding:26px 22px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;
+    border-top:1px solid var(--green-dim);
+  }
+  .foot-logo{font-family:var(--font-display);font-size:14px;color:var(--green);}
+  .foot-copy{font-size:11px;color:var(--grey);margin-top:4px;}
+  .foot-links{display:flex;gap:18px;font-size:12px;color:var(--grey);flex-wrap:wrap;}
+  .foot-icons{display:flex;gap:16px;align-items:center;color:var(--grey);font-size:12px;}
+
+  /* ===== toast ===== */
+  #toast{
+    position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);z-index:100;
+    background:var(--green);color:#0a0d09;font-family:var(--font-display);font-size:11px;
+    padding:14px 20px;border:1px solid #0a0d09;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ===== empty state ===== */
+  .stake-empty{padding:34px 26px;text-align:center;}
+  .stake-empty .empty-label{
+    font-size:11px;color:var(--grey);letter-spacing:1px;margin-bottom:16px;
+  }
+  .stake-empty .empty-title{
+    font-family:var(--font-display);font-size:15px;color:var(--white);
+    letter-spacing:.5px;margin-bottom:12px;
+  }
+  .stake-empty .empty-sub{
+    font-size:13px;color:var(--grey);max-width:38ch;margin:0 auto 22px;line-height:1.6;
+  }
+  .stake-empty .empty-ratio{
+    display:inline-flex;align-items:center;gap:10px;
+    font-family:var(--font-display);font-size:12px;
+    border:1px dashed var(--green-dim);padding:10px 16px;margin-bottom:24px;
+  }
+  .stake-empty .empty-ratio .accent{color:var(--green);}
+  .hidden{display:none !important;}
+
+  /* ===== stake modal ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(6,8,5,.82);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;z-index:200;
+  }
+  .modal-card{
+    width:100%;max-width:420px;padding:26px;background:var(--bg-panel);
+  }
+  .modal-head{
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;
+  }
+  .modal-title{
+    font-family:var(--font-display);font-size:13px;color:var(--white);letter-spacing:.5px;
+  }
+  .modal-close{
+    background:none;border:1px solid var(--green-dim);color:var(--grey);
+    width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+    font-size:14px;
+  }
+  .modal-close:hover{color:var(--green);border-color:var(--green);}
+  .modal-row{margin-bottom:18px;}
+  .modal-label{font-size:10.5px;color:var(--grey);letter-spacing:1px;margin-bottom:8px;}
+  .modal-value{font-family:var(--font-display);font-size:13px;color:var(--white);}
+  .amount-field{
+    display:flex;align-items:center;border:1px solid var(--green-dim);background:var(--bg);
+  }
+  .amount-field input{
+    flex:1;background:none;border:none;outline:none;color:var(--white);
+    font-family:var(--font-mono);font-size:15px;padding:14px;min-width:0;
+  }
+  .amount-field .max-btn{
+    font-family:var(--font-display);font-size:9px;color:var(--green);
+    background:none;border:none;border-left:1px solid var(--green-dim);
+    padding:14px 12px;letter-spacing:.5px;
+  }
+  .amount-field .max-btn:hover{background:var(--green-faint);}
+  .power-line{
+    display:flex;align-items:center;gap:10px;margin-top:10px;
+    font-family:var(--font-display);font-size:15px;color:var(--green);
+  }
+  .power-line .eq{color:var(--green-dim);font-size:13px;}
+  .modal-epoch{
+    display:flex;justify-content:space-between;align-items:center;
+    border:1px dashed var(--green-dim);padding:14px 16px;margin-bottom:20px;
+  }
+  .modal-epoch .m .label{font-size:10px;color:var(--grey);letter-spacing:.5px;margin-bottom:6px;}
+  .modal-epoch .m .value{font-family:var(--font-display);font-size:12px;color:var(--white);}
+  .modal-confirm{
+    width:100%;font-family:var(--font-display);font-size:12px;letter-spacing:.5px;
+    color:#0a0d09;background:var(--green);border:none;padding:16px;
+  }
+  .modal-confirm:hover{background:var(--green-soft);}
+
+  /* ===== account menu (connected wallet) ===== */
+  .account-wrap{position:relative;}
+  .account-dropdown{
+    position:absolute;right:0;top:calc(100% + 10px);
+    min-width:170px;background:var(--bg-panel);
+    border:1px solid var(--green-dim);
+    display:none;flex-direction:column;z-index:200;
+  }
+  .account-dropdown.open{display:flex;}
+  .account-dropdown a,.account-dropdown button{
+    text-align:left;background:none;border:none;width:100%;
+    color:var(--white);padding:12px 14px;
+    font-family:var(--font-display);font-size:9.5px;letter-spacing:.5px;
+    border-bottom:1px solid var(--green-faint);
+  }
+  .account-dropdown a:last-child,.account-dropdown button:last-child{border-bottom:none;}
+  .account-dropdown a:hover,.account-dropdown button:hover{background:var(--green-faint);color:var(--green);}
+  .account-dropdown button.disconnect{color:#ff5d5d;}
+  .account-dropdown button.disconnect:hover{background:rgba(255,93,93,.12);color:#ff5d5d;}
+
+  @media(min-width:921px){
+    .stake-panel .stake-top{flex-wrap:nowrap;}
+  }
+
+  @media(max-width:920px){
+    nav{display:none;}
+    .hero-tv{display:none;}
+    .hero-title{font-size:30px;}
+    .top-grid{grid-template-columns:1fr;}
+    .stat-row{grid-template-columns:repeat(2,1fr);}
+    .bottom-grid{grid-template-columns:1fr;}
+    .how-grid{grid-template-columns:repeat(2,1fr);}
+  }
+  @media(max-width:520px){
+    .stat-row{grid-template-columns:1fr;}
+    .stake-actions{flex-direction:column;}
+    .btn{width:100%;}
+    .power-callout{flex-direction:column;gap:6px;}
+    .epoch-row{flex-direction:column;align-items:flex-start;}
+    .how-grid{grid-template-columns:1fr;}
+    .modal-epoch{flex-direction:column;align-items:flex-start;gap:10px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOP BAR -->
+  <div class="frame topbar">
+    <a href="index.html" class="logo"><span class="logo-mark">K</span> KEYVRA</a>
+    <nav>
+      <a href="index.html">HOME</a>
+      <a href="epoch.html">EPOCH</a>
+      <a href="stake.html" class="active">STAKE</a>
+      <a href="docs.html">DOCS</a>
+    </nav>
+    <div id="walletArea"></div>
+  </div>
+
+  <!-- HERO -->
+  <div class="frame hero">
+    <div class="plus" style="top:26px;left:6%;">+</div>
+    <div class="plus" style="top:70px;left:12%;">+</div>
+    <div class="plus" style="top:120px;left:18%;">+</div>
+    <div class="plus" style="top:36px;left:24%;">+</div>
+    <div class="plus" style="top:150px;left:30%;">+</div>
+    <h1 class="hero-title">STAKE <span class="accent">YOUR KEYVRA</span></h1>
+    <div class="hero-subtitle">JOIN EVERY EPOCH.</div>
+    <hr class="hero-rule">
+    <p class="hero-sub">KEYVRA staking is not live yet. Epoch #001 is coming soon. Every KEYVRA = 1 TH of staking power — the more you stake, the greater your share.</p>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+      <button class="hero-btn" id="stakeNowBtn">▤ GET READY →</button>
+      <a href="#how-it-works" class="wallet-btn" style="text-decoration:none;">HOW IT WORKS</a>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section id="how-it-works">
+    <div class="section-head">HOW KEYVRA STAKING WORKS<div class="rule"></div></div>
+    <div class="how-grid">
+      <div class="frame how-card">
+        <div class="how-num">01</div>
+        <div class="how-title">STAKE</div>
+        <div class="how-desc">Stake KEYVRA when staking is live.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">02</div>
+        <div class="how-title">EARN TH</div>
+        <div class="how-desc">Every 1 KEYVRA = 1 TH of staking power.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">03</div>
+        <div class="how-title">JOIN EPOCH</div>
+        <div class="how-desc">Your stake participates in the active epoch.</div>
+      </div>
+      <div class="frame how-card">
+        <div class="how-num">04</div>
+        <div class="how-title">CLAIM REWARD</div>
+        <div class="how-desc">After the epoch ends, claim your share of the prize pool.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MECHANISM FLOW -->
+  <section>
+    <div class="frame flow-strip">
+      <span class="flow-step accent">KEYVRA</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">STAKE</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step accent">1 KEYVRA = 1 TH</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">EPOCH #001</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">3 DAYS</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">PRIZE POOL</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step accent">CLAIM REWARD</span>
+    </div>
+  </section>
+
+  <!-- CURRENT EPOCH + PRIZE POOL -->
+  <section>
+    <div class="section-head">CURRENT EPOCH<div class="rule"></div><span class="tag">EPOCH LENGTH ≈ 3 DAYS</span></div>
+    <div class="top-grid">
+      <div class="frame epoch-panel">
+        <div class="epoch-head">
+          <div>
+            <div class="k">EPOCH</div>
+            <div class="epoch-number">#001</div>
+          </div>
+          <span class="soon-badge">COMING SOON</span>
+        </div>
+        <div class="epoch-row">
+          <div class="epoch-ends">
+            <div class="label">STATUS</div>
+            <div class="value">COMING SOON</div>
+          </div>
+          <div class="epoch-next">
+            <div class="label">NEXT EPOCH</div>
+            <div class="value">#001 — COMING SOON</div>
+          </div>
+        </div>
+        <div class="epoch-progress">
+          <div class="epoch-track"><div class="epoch-fill" id="epochFill" style="width:0%;"></div></div>
+          <div class="epoch-caption"><span>WAITING FOR LAUNCH</span><span>EPOCH LENGTH ~3 DAYS</span></div>
+        </div>
+      </div>
+      <div class="frame prize-panel">
+        <div>
+          <div class="prize-label">EPOCH PRIZE POOL</div>
+          <div class="prize-value">—<span class="unit">KEYVRA</span></div>
+        </div>
+        <p class="prize-note">Prize pool will be determined when the epoch begins.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NETWORK STATS -->
+  <section>
+    <div class="section-head">NETWORK STATS<div class="rule"></div></div>
+    <div class="frame power-callout">
+      <span class="unit-box">1 KEYVRA</span>
+      <span class="eq">=</span>
+      <span class="unit-box accent">1 TH</span>
+    </div>
+    <div class="stat-row">
+      <div class="frame stat-box">
+        <svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7C10 3 4 3 4 7s6 4 8 0zM12 7c2-4 8-4 8 0s-6 4-8 0z"/></svg>
+        <div>
+          <div class="label">TOTAL STAKED</div>
+          <div class="value">0<span class="unit">KEYVRA</span></div>
+        </div>
+      </div>
+      <div class="frame stat-box">
+        <svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h8l-1 8 10-12h-8z"/></svg>
+        <div>
+          <div class="label">TOTAL STAKING POWER</div>
+          <div class="value accent">0<span class="unit">TH</span></div>
+        </div>
+      </div>
+      <div class="frame stat-box">
+        <svg class="icon" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6M15 14.5c3 .2 5 2.3 5 5.5"/></svg>
+        <div>
+          <div class="label">TOTAL STAKERS</div>
+          <div class="value">0</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- YOUR STAKE -->
+  <section>
+    <div class="section-head">YOUR STAKE<div class="rule"></div><span class="tag">EPOCH #001</span></div>
+    <div class="stake-panel">
+
+      <!-- empty state: shown by default for a first-time user -->
+      <div class="frame stake-empty" id="stakeEmptyState">
+        <div class="empty-label">YOUR STAKE</div>
+        <div class="empty-title">NO ACTIVE STAKE</div>
+        <p class="empty-sub">KEYVRA staking is not live yet.<br>Be ready for Epoch #001.</p>
+        <div class="empty-ratio">1 KEYVRA <span class="eq">=</span> <span class="accent">1 TH</span></div>
+        <div>
+          <button class="hero-btn" id="stakeEmptyBtn">GET READY →</button>
+        </div>
+      </div>
+
+      <!-- active state: shown once a stake exists -->
+      <div class="frame stake-card hidden" id="stakeActiveState">
+        <div class="stake-top">
+          <div class="stake-amount">
+            <div class="label">YOUR STAKE</div>
+            <div class="value" id="stakeAmountValue">0 KEYVRA</div>
+            <div class="eq-line"><span>=</span><span id="stakeThValue">0 TH</span></div>
+          </div>
+          <div class="stake-meta">
+            <div class="m">
+              <div class="label">YOUR SHARE</div>
+              <div class="value accent" id="stakeShareValue">0%</div>
+            </div>
+            <div class="m">
+              <div class="label">CURRENT EPOCH</div>
+              <div class="value">#001</div>
+            </div>
+            <div class="m">
+              <div class="label">EST. EPOCH REWARD</div>
+              <div class="value accent" id="stakeRewardValue">0<span style="font-size:9px;color:var(--grey);margin-left:4px;">KEYVRA</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="stake-actions">
+          <button class="btn primary" id="stakeMoreBtn">+ STAKE MORE</button>
+          <button class="btn ghost" id="unstakeBtn">UNSTAKE</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EPOCH REWARD -->
+  <section>
+    <div class="section-head">YOUR EPOCH REWARD<div class="rule"></div></div>
+    <div class="bottom-grid">
+      <div class="frame panel">
+        <div class="panel-title">PENDING REWARDS</div>
+        <div class="pending-box">
+          <div class="pending-label">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="8" width="18" height="13"/><path d="M3 8h18M12 8v13M7 8a3 3 0 1 1 5-3 3 3 0 1 1 5 3"/></svg>
+            PENDING REWARDS
+          </div>
+          <div class="pending-value" id="pendingValue">0<span class="unit">KEYVRA</span></div>
+        </div>
+        <button class="claim-btn" id="claimBtn" disabled style="opacity:.35;">CLAIM REWARDS</button>
+        <div class="claim-note">Rewards can be claimed after the epoch ends.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="frame">
+    <div>
+      <div class="foot-logo">KEYVRA</div>
+      <div class="foot-copy">© 2026 KEYVRA</div>
+    </div>
+    <div class="foot-links">
+      <a href="index.html">HOME</a><a href="epoch.html">EPOCH</a><a href="stake.html">STAKE</a><a href="docs.html">DOCS</a>
+    </div>
+    <div class="foot-icons">
+      <a href="https://x.com/keyvraRH" target="_blank" rel="noopener">✕ @keyvraRH</a>
+    </div>
+  </footer>
+
+</div>
+
+<!-- STAKE MODAL -->
+<div class="modal-overlay hidden" id="stakeModal">
+  <div class="frame modal-card">
+    <div class="modal-head">
+      <div class="modal-title">STAKE KEYVRA</div>
+      <button class="modal-close" id="modalCloseBtn">✕</button>
+    </div>
+
+    <div class="modal-row">
+      <div class="empty-title" style="font-size:13px;">STAKING COMING SOON</div>
+      <p class="empty-sub" style="margin:12px 0 0;max-width:none;">Epoch #001 has not started yet. Staking will become available when it launches.</p>
+    </div>
+
+    <div class="modal-epoch">
+      <div class="m">
+        <div class="label">EPOCH STATUS</div>
+        <div class="value">COMING SOON</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  var toastEl = document.getElementById('toast');
+  var toastTimer;
+  function showToast(msg){
+    clearTimeout(toastTimer);
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2400);
+  }
+
+  /* ===== stake modal (pre-launch) ===== */
+  var modalEl = document.getElementById('stakeModal');
+
+  function openStakeModal(){
+    modalEl.classList.remove('hidden');
+  }
+  function closeStakeModal(){
+    modalEl.classList.add('hidden');
+  }
+
+  document.getElementById('stakeNowBtn').addEventListener('click', openStakeModal);
+  document.getElementById('stakeEmptyBtn').addEventListener('click', openStakeModal);
+  document.getElementById('stakeMoreBtn').addEventListener('click', openStakeModal);
+  document.getElementById('modalCloseBtn').addEventListener('click', closeStakeModal);
+  modalEl.addEventListener('click', function(e){
+    if(e.target === modalEl) closeStakeModal();
+  });
+
+  document.getElementById('unstakeBtn').addEventListener('click', function(){
+    showToast('Staking is not live yet.');
+  });
+  document.getElementById('claimBtn').addEventListener('click', function(){
+    /* disabled: no pending rewards until staking launches */
+  });
+
+  /* Epoch #001 is pre-launch: no countdown, no progress.
+     epochFill is left at 0% width in the markup above. */
+</script>
+<script src="wallet.js"></script>
+</body>
+</html>
